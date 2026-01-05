@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fluent UI inspired base styles */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary: #0078d4;
+    --primary-dark: #005a9e;
+    --accent: #8a2be2;
+    --success: #107c10;
+    --warning: #ffb900;
+    --danger: #d13438;
+}
+
+body {
+    font-family: 'Noto Sans', 'Segoe UI', system-ui, sans-serif;
+    @apply bg-neutral-50 text-neutral-900 antialiased;
+}
+
+.dark body {
+    @apply bg-neutral-900 text-neutral-50;
+}
+
+/* Fluent UI Card */
+.card {
+    @apply bg-white rounded-lg shadow-fluent p-6 border border-neutral-200;
+}
+
+.dark .card {
+    @apply bg-neutral-800 border-neutral-700;
+}
+
+/* Fluent UI Button */
+.btn {
+    @apply px-4 py-2 rounded-fluent font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.btn-primary {
+    @apply bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500;
+}
+
+.btn-secondary {
+    @apply bg-neutral-200 text-neutral-700 hover:bg-neutral-300 focus:ring-neutral-500;
+}
+
+.btn-danger {
+    @apply bg-danger-500 text-white hover:bg-danger-600 focus:ring-danger-500;
+}
+
+.btn-success {
+    @apply bg-success-500 text-white hover:bg-success-600 focus:ring-success-500;
+}
+
+/* Fluent UI Input */
+.input {
+    @apply w-full px-3 py-2 border border-neutral-300 rounded-fluent focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all;
+}
+
+.dark .input {
+    @apply bg-neutral-800 border-neutral-600 text-white;
+}
+
+/* Stat Card */
+.stat-card {
+    @apply bg-white rounded-lg shadow-fluent p-4 border-l-4;
+}
+
+/* Notification Ticker */
+.ticker {
+    @apply overflow-hidden whitespace-nowrap;
+}
+
+.ticker-content {
+    @apply inline-block animate-marquee;
+}
+
+@keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+.animate-marquee {
+    animation: marquee 20s linear infinite;
+}
+
+/* Status badges */
+.badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-pending { @apply bg-yellow-100 text-yellow-800; }
+.badge-approved { @apply bg-green-100 text-green-800; }
+.badge-rejected { @apply bg-red-100 text-red-800; }
+.badge-completed { @apply bg-blue-100 text-blue-800; }
+
+/* Meeting type colors */
+.meeting-office { border-left-color: #0078d4; }
+.meeting-boardroom { border-left-color: #107c10; }
+.meeting-online { border-left-color: #8764b8; }
+.meeting-site { border-left-color: #ffb900; }
+.meeting-lab { border-left-color: #00b7c3; }
