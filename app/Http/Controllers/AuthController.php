@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Lab;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -13,7 +14,11 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
-        return Inertia::render('Auth/Login');
+        $labs = Lab::active()->select('id', 'lab_code', 'lab_name', 'full_name')->get();
+
+        return Inertia::render('Auth/Login', [
+            'labs' => $labs
+        ]);
     }
 
     public function login(Request $request)
@@ -21,27 +26,43 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
+            'lab_id' => 'required|exists:labs,id',
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
-            $user = Auth::user();
-            $user->last_login_at = now();
-            $user->save();
+        // Find user with matching lab
+        $user = User::where('email', $credentials['email'])
+            ->where('lab_id', $credentials['lab_id'])
+            ->first();
 
-            if ($request->wantsJson()) {
-                return response()->json([
-                    'user' => $user,
-                    'token' => $user->createToken('auth-token')->plainTextToken,
-                ]);
-            }
-
-            return redirect()->intended('/dashboard');
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect or user does not belong to this lab.'],
+            ]);
         }
 
-        throw ValidationException::withMessages([
-            'email' => ['The provided credentials are incorrect.'],
-        ]);
+        if (!$user->is_active) {
+            throw ValidationException::withMessages([
+                'email' => ['Your account has been deactivated. Please contact administrator.'],
+            ]);
+        }
+
+        Auth::login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
+
+        $user->last_login_at = now();
+        $user->save();
+
+        // Store lab in session
+        $request->session()->put('current_lab_id', $user->lab_id);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'user' => $user->load('lab'),
+                'token' => $user->createToken('auth-token')->plainTextToken,
+            ]);
+        }
+
+        return redirect()->intended('/dashboard');
     }
 
     public function logout(Request $request)
@@ -59,20 +80,31 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        return response()->json($request->user());
+        return response()->json($request->user()->load('lab'));
+    }
+
+    public function showProfile()
+    {
+        return Inertia::render('Profile/Index');
     }
 
     public function updateProfile(Request $request)
     {
         $user = $request->user();
         $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'department' => 'nullable|string|max:100',
         ]);
 
         $user->update($validated);
-        return response()->json(['user' => $user->fresh()]);
+
+        if ($request->wantsJson()) {
+            return response()->json(['user' => $user->fresh()]);
+        }
+
+        return back()->with('success', 'Profile updated successfully.');
     }
 
     public function updatePassword(Request $request)

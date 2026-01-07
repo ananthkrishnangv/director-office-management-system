@@ -14,6 +14,7 @@ class MeetingSchedule extends Model
         'director_id',
         'appointment_id',
         'created_by',
+        'lab_id',
         'title',
         'description',
         'meeting_type',
@@ -36,6 +37,13 @@ class MeetingSchedule extends Model
         'priority',
         'is_private',
         'color',
+        'documents',
+        'minutes',
+        'scheduled_date',
+        'visitor_name',
+        'visitor_email',
+        'visitor_phone',
+        'visitor_organization',
     ];
 
     protected function casts(): array
@@ -47,6 +55,8 @@ class MeetingSchedule extends Model
             'attendees' => 'array',
             'is_recurring' => 'boolean',
             'is_private' => 'boolean',
+            'documents' => 'array',
+            'scheduled_date' => 'date',
         ];
     }
 
@@ -172,7 +182,7 @@ class MeetingSchedule extends Model
     public function scopeUpcoming($query)
     {
         return $query->where('start_time', '>=', now())
-                     ->orderBy('start_time');
+            ->orderBy('start_time');
     }
 
     /**
@@ -197,6 +207,22 @@ class MeetingSchedule extends Model
     public function scopeActive($query)
     {
         return $query->whereNotIn('status', [self::STATUS_CANCELLED]);
+    }
+
+    /**
+     * Lab this meeting belongs to
+     */
+    public function lab()
+    {
+        return $this->belongsTo(Lab::class);
+    }
+
+    /**
+     * Scope to filter meetings by lab
+     */
+    public function scopeForLab($query, $labId)
+    {
+        return $query->where('lab_id', $labId);
     }
 
     /**

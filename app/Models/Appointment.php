@@ -12,6 +12,7 @@ class Appointment extends Model
     protected $fillable = [
         'director_id',
         'created_by',
+        'lab_id',
         'requester_name',
         'requester_email',
         'requester_phone',
@@ -111,7 +112,7 @@ class Appointment extends Model
         $this->approved_date = $date ?? $this->requested_date;
         $this->approved_start_time = $startTime ?? $this->requested_start_time;
         $this->approved_end_time = $endTime ?? $this->requested_end_time;
-        
+
         return $this->save();
     }
 
@@ -122,7 +123,7 @@ class Appointment extends Model
     {
         $this->status = self::STATUS_REJECTED;
         $this->rejection_reason = $reason;
-        
+
         return $this->save();
     }
 
@@ -165,8 +166,8 @@ class Appointment extends Model
     public function scopeUpcoming($query)
     {
         return $query->where('requested_date', '>=', today())
-                     ->orderBy('requested_date')
-                     ->orderBy('requested_start_time');
+            ->orderBy('requested_date')
+            ->orderBy('requested_start_time');
     }
 
     /**
@@ -175,6 +176,22 @@ class Appointment extends Model
     public function scopeForDirector($query, int $directorId)
     {
         return $query->where('director_id', $directorId);
+    }
+
+    /**
+     * Lab this appointment belongs to
+     */
+    public function lab()
+    {
+        return $this->belongsTo(Lab::class);
+    }
+
+    /**
+     * Scope to filter appointments by lab
+     */
+    public function scopeForLab($query, $labId)
+    {
+        return $query->where('lab_id', $labId);
     }
 
     /**

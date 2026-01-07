@@ -26,6 +26,7 @@ class User extends Authenticatable
         'avatar',
         'is_active',
         'last_login_at',
+        'lab_id',
     ];
 
     /**
@@ -160,6 +161,24 @@ class User extends Authenticatable
     {
         return $this->hasOne(NotificationPreference::class, 'user_id');
     }
+
+    /**
+     * Lab this user belongs to
+     */
+    public function lab()
+    {
+        return $this->belongsTo(Lab::class);
+    }
+
+    /**
+     * Scope to filter users by lab
+     */
+    public function scopeForLab($query, $labId)
+    {
+        return $query->where('lab_id', $labId);
+    }
+
+
 
     /**
      * Scope for active users

@@ -8,6 +8,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\TodoController;
 use App\Http\Controllers\JournalController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PublicMeetingController;
 
 // Public routes
 Route::get('/', function () {
@@ -15,12 +16,17 @@ Route::get('/', function () {
 });
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Public appointment request form
 Route::get('/appointment-request', [AppointmentController::class, 'create'])->name('appointment.request');
 Route::post('/appointment-request', [AppointmentController::class, 'store']);
+
+// Public meeting request
+Route::get('/request-meeting', [\App\Http\Controllers\PublicMeetingController::class, 'create'])->name('public.meeting.request');
+Route::post('/api/public/meeting-request', [\App\Http\Controllers\PublicMeetingController::class, 'store']);
+Route::get('/api/calendar/date/{date}', [\App\Http\Controllers\CalendarController::class, 'date']);
 
 // Authenticated routes
 Route::middleware(['auth'])->group(function () {
@@ -57,6 +63,25 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/journal/{journal}', [JournalController::class, 'update'])->name('journal.update');
 
     // Profile
+    Route::get('/profile', [AuthController::class, 'showProfile'])->name('profile.index');
     Route::put('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::put('/profile/password', [AuthController::class, 'updatePassword'])->name('profile.password');
+
+    // Archive
+    Route::get('/archive', [\App\Http\Controllers\ArchiveController::class, 'index'])->name('archive.index');
+    Route::get('/archive/{meeting}', [\App\Http\Controllers\ArchiveController::class, 'show'])->name('archive.show');
+    Route::put('/archive/{meeting}', [\App\Http\Controllers\ArchiveController::class, 'update'])->name('archive.update');
+    Route::post('/archive/{meeting}/upload', [\App\Http\Controllers\ArchiveController::class, 'uploadDocument'])->name('archive.upload');
+
+    // Blocked Dates (Director/PA only)
+    Route::get('/blocked-dates', [\App\Http\Controllers\BlockedDateController::class, 'index'])->name('blocked-dates.index');
+    Route::post('/blocked-dates', [\App\Http\Controllers\BlockedDateController::class, 'store'])->name('blocked-dates.store');
+    Route::delete('/blocked-dates/{blockedDate}', [\App\Http\Controllers\BlockedDateController::class, 'destroy'])->name('blocked-dates.destroy');
+    Route::get('/api/blocked-dates', [\App\Http\Controllers\BlockedDateController::class, 'getBlockedDates']);
 });
+
+// Kiosk Mode (PIN-based, no auth required)
+Route::get('/kiosk', [\App\Http\Controllers\KioskController::class, 'index'])->name('kiosk.login');
+Route::post('/kiosk/authenticate', [\App\Http\Controllers\KioskController::class, 'authenticate'])->name('kiosk.authenticate');
+Route::get('/kiosk/dashboard', [\App\Http\Controllers\KioskController::class, 'dashboard'])->name('kiosk.dashboard');
+Route::post('/kiosk/logout', [\App\Http\Controllers\KioskController::class, 'logout'])->name('kiosk.logout');

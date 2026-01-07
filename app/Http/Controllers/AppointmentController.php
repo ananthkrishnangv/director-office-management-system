@@ -54,8 +54,8 @@ class AppointmentController extends Controller
         if ($request->search) {
             $query->where(function ($q) use ($request) {
                 $q->where('requester_name', 'ilike', "%{$request->search}%")
-                  ->orWhere('requester_email', 'ilike', "%{$request->search}%")
-                  ->orWhere('purpose', 'ilike', "%{$request->search}%");
+                    ->orWhere('requester_email', 'ilike', "%{$request->search}%")
+                    ->orWhere('purpose', 'ilike', "%{$request->search}%");
             });
         }
 
@@ -137,7 +137,6 @@ class AppointmentController extends Controller
      */
     public function approve(Request $request, Appointment $appointment)
     {
-        $this->authorize('approve', $appointment);
 
         if (!$appointment->isPending()) {
             return response()->json([
@@ -182,7 +181,6 @@ class AppointmentController extends Controller
      */
     public function reject(Request $request, Appointment $appointment)
     {
-        $this->authorize('reject', $appointment);
 
         if (!$appointment->isPending()) {
             return response()->json([

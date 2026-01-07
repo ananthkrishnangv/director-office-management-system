@@ -1,103 +1,295 @@
+/* Import Inter font for headings */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Noto+Sans:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Fluent UI inspired base styles */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap');
+@layer base {
+  html {
+    font-family: 'Noto Sans', system-ui, sans-serif;
+  }
 
-:root {
-    --primary: #0078d4;
-    --primary-dark: #005a9e;
-    --accent: #8a2be2;
-    --success: #107c10;
-    --warning: #ffb900;
-    --danger: #d13438;
+  body {
+    @apply antialiased text-neutral-700;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  }
+
+  /* Headings use Inter */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  h1 {
+    @apply text-2xl font-extrabold;
+  }
+
+  h2 {
+    @apply text-xl font-bold;
+  }
+
+  h3 {
+    @apply text-lg font-semibold;
+  }
+
+  h4 {
+    @apply text-base font-semibold;
+  }
 }
 
-body {
-    font-family: 'Noto Sans', 'Segoe UI', system-ui, sans-serif;
-    @apply bg-neutral-50 text-neutral-900 antialiased;
+@layer components {
+
+  /* Fluent UI Card with Glassmorphism */
+  .fluent-card {
+    @apply bg-white/90 rounded-2xl border border-white/60;
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.04),
+      0 1px 2px rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+  }
+
+  .fluent-card:hover {
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.08),
+      0 2px 4px rgba(0, 0, 0, 0.04);
+    transform: translateY(-1px);
+  }
+
+  /* Fluent UI Inputs */
+  .fluent-input {
+    @apply w-full px-4 py-3 bg-white/80 border border-neutral-200/80 rounded-xl text-neutral-800;
+    @apply focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all;
+    @apply placeholder:text-neutral-400;
+    backdrop-filter: blur(4px);
+  }
+
+  .fluent-select {
+    @apply w-full px-4 py-3 bg-white/80 border border-neutral-200/80 rounded-xl text-neutral-800;
+    @apply focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all appearance-none;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Buttons with Fluent UI style */
+  .btn {
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-semibold transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 focus:ring-blue-500;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    @apply bg-white/80 text-neutral-700 border border-neutral-200 hover:bg-white focus:ring-neutral-400;
+    backdrop-filter: blur(4px);
+  }
+
+  .btn-success {
+    @apply bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 focus:ring-green-500;
+    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.25);
+  }
+
+  .btn-danger {
+    @apply bg-white text-red-600 border border-red-200 hover:bg-red-50 focus:ring-red-500;
+  }
+
+  /* Status Badges */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .badge-pending {
+    @apply bg-amber-100 text-amber-700;
+  }
+
+  .badge-approved {
+    @apply bg-green-100 text-green-700;
+  }
+
+  .badge-rejected {
+    @apply bg-red-100 text-red-700;
+  }
+
+  .badge-scheduled {
+    @apply bg-blue-100 text-blue-700;
+  }
+
+  /* Navigation */
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium;
+  }
+
+  .nav-item-active {
+    @apply bg-blue-50/80 text-blue-600;
+    box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.1);
+  }
+
+  .nav-item-inactive {
+    @apply text-neutral-600 hover:bg-neutral-50/80 hover:text-neutral-800;
+  }
+
+  /* Table Styles */
+  .fluent-table {
+    @apply w-full text-sm;
+  }
+
+  .fluent-table th {
+    @apply px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wide bg-neutral-50/80 border-b border-neutral-200;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .fluent-table td {
+    @apply px-4 py-4 border-b border-neutral-100;
+  }
+
+  .fluent-table tbody tr:hover {
+    @apply bg-neutral-50/50;
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-neutral-100/50 rounded;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-neutral-300 rounded hover:bg-neutral-400;
+  }
+
+  /* Empty State */
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-12 text-neutral-400;
+  }
+
+  .empty-state-icon {
+    @apply w-16 h-16 mb-4 opacity-50;
+  }
+
+  /* Stats Card - Enhanced */
+  .stat-card {
+    @apply fluent-card p-5 border-l-4;
+  }
+
+  .stat-card-value {
+    @apply text-3xl font-bold text-neutral-800;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .stat-card-label {
+    @apply text-xs text-neutral-500 font-medium uppercase tracking-wide;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .stat-card-trend {
+    @apply flex items-center gap-1 text-xs font-medium mt-2;
+  }
+
+  .stat-card-trend-up {
+    @apply text-green-600;
+  }
+
+  .stat-card-trend-down {
+    @apply text-red-600;
+  }
+
+  /* Glassmorphism utilities */
+  .glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+
+  .glass-dark {
+    background: rgba(30, 41, 59, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
 }
 
-.dark body {
-    @apply bg-neutral-900 text-neutral-50;
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
-/* Fluent UI Card */
-.card {
-    @apply bg-white rounded-lg shadow-fluent p-6 border border-neutral-200;
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.dark .card {
-    @apply bg-neutral-800 border-neutral-700;
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-/* Fluent UI Button */
-.btn {
-    @apply px-4 py-2 rounded-fluent font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
-.btn-primary {
-    @apply bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500;
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
 }
 
-.btn-secondary {
-    @apply bg-neutral-200 text-neutral-700 hover:bg-neutral-300 focus:ring-neutral-500;
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
 }
 
-.btn-danger {
-    @apply bg-danger-500 text-white hover:bg-danger-600 focus:ring-danger-500;
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out;
 }
 
-.btn-success {
-    @apply bg-success-500 text-white hover:bg-success-600 focus:ring-success-500;
+.animate-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }
 
-/* Fluent UI Input */
-.input {
-    @apply w-full px-3 py-2 border border-neutral-300 rounded-fluent focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all;
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
 }
-
-.dark .input {
-    @apply bg-neutral-800 border-neutral-600 text-white;
-}
-
-/* Stat Card */
-.stat-card {
-    @apply bg-white rounded-lg shadow-fluent p-4 border-l-4;
-}
-
-/* Notification Ticker */
-.ticker {
-    @apply overflow-hidden whitespace-nowrap;
-}
-
-.ticker-content {
-    @apply inline-block animate-marquee;
-}
-
-@keyframes marquee {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
-}
-
-.animate-marquee {
-    animation: marquee 20s linear infinite;
-}
-
-/* Status badges */
-.badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-}
-
-.badge-pending { @apply bg-yellow-100 text-yellow-800; }
-.badge-approved { @apply bg-green-100 text-green-800; }
-.badge-rejected { @apply bg-red-100 text-red-800; }
-.badge-completed { @apply bg-blue-100 text-blue-800; }
-
-/* Meeting type colors */
-.meeting-office { border-left-color: #0078d4; }
-.meeting-boardroom { border-left-color: #107c10; }
-.meeting-online { border-left-color: #8764b8; }
-.meeting-site { border-left-color: #ffb900; }
-.meeting-lab { border-left-color: #00b7c3; }

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Lab;
 use App\Models\DirectorAvailability;
 use App\Models\NotificationPreference;
 use Illuminate\Database\Seeder;
@@ -12,7 +13,22 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create Director
+        // Create CSIR-SERC Lab
+        $serc = Lab::create([
+            'lab_code' => 'SERC',
+            'lab_name' => 'CSIR-SERC',
+            'full_name' => 'Structural Engineering Research Centre',
+            'address' => 'CSIR Campus, Taramani, Chennai',
+            'city' => 'Chennai',
+            'state' => 'Tamil Nadu',
+            'pincode' => '600113',
+            'phone' => '+91-44-22549201',
+            'email' => 'director@serc.res.in',
+            'website' => 'https://www.serc.res.in',
+            'is_active' => true,
+        ]);
+
+        // Create Director for CSIR-SERC
         $director = User::create([
             'name' => 'Director',
             'email' => 'director@serc.res.in',
@@ -22,28 +38,31 @@ class DatabaseSeeder extends Seeder
             'designation' => 'Director',
             'phone' => '+91-9876543210',
             'is_active' => true,
+            'lab_id' => $serc->id,
         ]);
 
-        // Create PA
+        // Create PA to Director for CSIR-SERC
         User::create([
             'name' => 'Personal Assistant',
             'email' => 'pa@serc.res.in',
             'password' => Hash::make('password'),
             'role' => 'pa',
             'department' => 'Director Office',
-            'designation' => 'Personal Assistant',
+            'designation' => 'Personal Assistant to Director',
             'is_active' => true,
+            'lab_id' => $serc->id,
         ]);
 
-        // Create Admin
+        // Create Admin for CSIR-SERC
         User::create([
             'name' => 'System Administrator',
             'email' => 'admin@serc.res.in',
             'password' => Hash::make('password'),
             'role' => 'admin',
-            'department' => 'IT',
-            'designation' => 'System Admin',
+            'department' => 'IT Division',
+            'designation' => 'System Administrator',
             'is_active' => true,
+            'lab_id' => $serc->id,
         ]);
 
         // Create availability for director (Mon-Fri, 10:00-17:00)
