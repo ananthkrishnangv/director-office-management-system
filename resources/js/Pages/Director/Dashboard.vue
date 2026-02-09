@@ -3,27 +3,27 @@
     <div class="space-y-6 max-w-[1600px] mx-auto">
       
       <!-- Welcome Banner -->
-      <div class="fluent-card p-6 flex flex-col md:flex-row items-center justify-between gap-6 border-l-4 border-l-blue-500">
-        <div class="flex items-center gap-6">
+      <div class="fluent-card p-4 flex flex-col md:flex-row items-center justify-between gap-4 border-l-4 border-l-blue-500">
+        <div class="flex items-center gap-4">
           <div class="relative">
             <img 
               src="/images/directorprofile.png" 
               alt="Director" 
-              class="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover"
+              class="w-16 h-16 rounded-full border-4 border-white shadow-lg object-cover"
             />
-            <div class="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-3 border-white rounded-full"></div>
+            <div class="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
           </div>
           <div>
-            <p class="text-sm text-neutral-500 font-medium">Hello,</p>
-            <h1 class="text-2xl font-bold text-neutral-800">{{ $page.props.auth.user.name }}</h1>
-            <p class="text-neutral-500">{{ $page.props.auth.user.role === 'director' ? 'Director, CSIR-SERC' : $page.props.auth.user.role }}</p>
-            <div class="flex items-center gap-4 mt-2 text-sm text-neutral-500">
+            <p class="text-xs text-neutral-500 font-medium">Hello,</p>
+            <h1 class="text-xl font-bold text-neutral-800">{{ $page.props.auth.user.name }}</h1>
+            <p class="text-sm text-neutral-500">{{ $page.props.auth.user.role === 'director' ? 'Director, CSIR-SERC' : $page.props.auth.user.role }}</p>
+            <div class="flex items-center gap-4 mt-1 text-xs text-neutral-500">
               <span class="flex items-center gap-1">
-                <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/></svg>
+                <svg class="w-3 h-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/></svg>
                 {{ currentDate }}
               </span>
               <span class="flex items-center gap-1">
-                <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/></svg>
+                <svg class="w-3 h-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/></svg>
                 {{ currentTime }}
               </span>
             </div>
@@ -32,26 +32,26 @@
         
         <!-- Mini Clock Widget -->
         <div class="hidden lg:flex items-center gap-6">
-          <div class="bg-blue-50 rounded-2xl p-4 text-center min-w-[120px]">
-            <div class="text-4xl font-bold text-blue-600 font-mono">{{ currentTime }}</div>
-            <div class="text-xs text-blue-400 uppercase tracking-wide mt-1">Current Time</div>
+          <div class="bg-blue-50 rounded-xl p-3 text-center min-w-[100px]">
+            <div class="text-2xl font-bold text-blue-600 font-mono">{{ currentTime }}</div>
+            <div class="text-[10px] text-blue-400 uppercase tracking-wide">Current Time</div>
           </div>
         </div>
       </div>
 
       <!-- Stats Cards Row -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div v-for="stat in stats" :key="stat.label" class="fluent-card p-4 border-l-4" :class="stat.borderColor">
+        <div v-for="stat in stats" :key="stat.label" class="fluent-card p-3 border-l-4" :class="stat.borderColor">
           <div class="flex items-start justify-between">
             <div>
-              <p class="text-xs text-neutral-500 font-medium uppercase tracking-wide">{{ stat.label }}</p>
-              <p class="text-3xl font-bold text-neutral-800 mt-1">{{ stat.value }}</p>
+              <p class="text-[10px] text-neutral-500 font-medium uppercase tracking-wide">{{ stat.label }}</p>
+              <p class="text-2xl font-bold text-neutral-800 mt-1">{{ stat.value }}</p>
             </div>
-            <div class="p-2 rounded-lg" :class="stat.iconBg">
-              <component :is="stat.icon" class="w-5 h-5" :class="stat.iconColor" />
+            <div class="p-1.5 rounded-lg" :class="stat.iconBg">
+              <component :is="stat.icon" class="w-4 h-4" :class="stat.iconColor" />
             </div>
           </div>
-          <div class="flex items-center gap-1 mt-2 text-xs">
+          <div class="flex items-center gap-1 mt-1 text-[10px]">
             <span :class="stat.trend >= 0 ? 'text-green-600' : 'text-red-600'" class="flex items-center gap-0.5">
               <svg v-if="stat.trend >= 0" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"/></svg>
               <svg v-else class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z"/></svg>
@@ -66,28 +66,28 @@
       <div class="grid lg:grid-cols-12 gap-6">
         
         <!-- Calendar Section -->
-        <div class="lg:col-span-7 fluent-card p-6">
-          <div class="flex items-center justify-between mb-6">
+        <div class="lg:col-span-7 fluent-card p-4">
+          <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-4">
-              <select v-model="calendarView" class="text-sm border border-neutral-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <select v-model="calendarView" class="text-xs border border-neutral-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <option value="month">Month</option>
                 <option value="week">Week</option>
               </select>
-              <div class="flex items-center gap-2">
-                <button @click="prevMonth" class="p-1.5 hover:bg-neutral-100 rounded-lg transition-colors">
-                  <svg class="w-5 h-5 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              <div class="flex items-center gap-1">
+                <button @click="prevMonth" class="p-1 hover:bg-neutral-100 rounded-lg transition-colors">
+                  <svg class="w-4 h-4 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 </button>
-                <span class="font-semibold text-neutral-800 min-w-[140px] text-center">{{ calendarTitle }}</span>
-                <button @click="nextMonth" class="p-1.5 hover:bg-neutral-100 rounded-lg transition-colors">
-                  <svg class="w-5 h-5 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <span class="font-semibold text-neutral-800 min-w-[120px] text-center text-sm">{{ calendarTitle }}</span>
+                <button @click="nextMonth" class="p-1 hover:bg-neutral-100 rounded-lg transition-colors">
+                  <svg class="w-4 h-4 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
               </div>
             </div>
           </div>
           
           <!-- Calendar Grid -->
-          <div class="grid grid-cols-7 gap-1 mb-2">
-            <div v-for="day in weekDays" :key="day" class="text-center text-xs font-semibold text-neutral-500 py-2 uppercase tracking-wide">
+          <div class="grid grid-cols-7 gap-1 mb-1">
+            <div v-for="day in weekDays" :key="day" class="text-center text-[10px] font-semibold text-neutral-500 py-1 uppercase tracking-wide">
               {{ day }}
             </div>
           </div>
@@ -95,23 +95,52 @@
             <div 
               v-for="date in calendarDays" 
               :key="date.key"
-              @click="selectDate(date)"
-              class="aspect-square p-1 rounded-xl cursor-pointer transition-all hover:bg-neutral-50 flex flex-col items-center justify-center relative"
+              @click="!date.isBlocked && selectDate(date)"
+              @mouseenter="(e) => handleMouseEnter(e, date)"
+              @mouseleave="handleMouseLeave"
+              class="aspect-square p-0.5 rounded-lg cursor-pointer transition-all hover:bg-neutral-50 flex flex-col items-center justify-center relative border border-transparent"
               :class="{
-                'bg-blue-500 text-white hover:bg-blue-600': date.isSelected,
-                'bg-blue-50': date.isToday && !date.isSelected,
-                'text-neutral-300': !date.isCurrentMonth
+                'bg-blue-500 text-white hover:bg-blue-600': date.isSelected && !date.isBlocked,
+                'bg-blue-50': date.isToday && !date.isSelected && !date.isBlocked,
+                'text-neutral-300': !date.isCurrentMonth,
+                'bg-neutral-100 cursor-not-allowed opacity-60': date.isBlocked,
+                'border-red-100': date.isBlocked
               }"
             >
-              <span class="text-sm font-medium">{{ date.day }}</span>
-              <div v-if="date.events.length > 0" class="flex gap-0.5 mt-0.5">
+              <span class="text-xs font-medium" :class="{'text-red-400': date.isBlocked && !date.isSelected}">{{ date.day }}</span>
+              <div v-if="date.isBlocked" class="hidden"></div>
+              <div v-else-if="date.events.length > 0" class="flex gap-0.5 mt-0.5">
                 <span 
                   v-for="(event, i) in date.events.slice(0, 3)" 
                   :key="i" 
-                  class="w-1.5 h-1.5 rounded-full"
-                  :class="getEventDotColor(event.type)"
+                  class="w-1 h-1 rounded-full"
+                  :class="getEventDotColor(event.extendedProps?.meeting_type || 'meeting')"
                 ></span>
               </div>
+            </div>
+          </div>
+
+          <!-- Hover Popup -->
+          <div 
+            v-if="hoveredDate" 
+            class="fixed z-50 bg-white shadow-xl rounded-xl p-3 border border-neutral-200 w-64 pointer-events-none transform -translate-x-1/2 transition-all duration-200"
+            :style="{ top: `${hoverPosition.y}px`, left: `${hoverPosition.x}px` }"
+          >
+            <div class="text-xs font-bold text-neutral-800 border-b border-neutral-100 pb-1 mb-1">
+              {{ formatDate(hoveredDate.date) }}
+              <span v-if="hoveredDate.isBlocked" class="block text-[10px] text-red-500 font-normal mt-0.5">
+                BLOCKED: Unavailable
+              </span>
+            </div>
+            
+            <div v-if="hoveredEvents.length > 0" class="space-y-1">
+              <div v-for="(event, i) in hoveredEvents" :key="i" class="text-[10px]">
+                  <div class="font-semibold text-blue-600 truncate">{{ event.title }}</div>
+                  <div class="text-neutral-500">{{ formatTime(event.start) }}</div>
+              </div>
+            </div>
+            <div v-else-if="!hoveredDate.isBlocked" class="text-[10px] text-neutral-400 italic">
+              No meetings
             </div>
           </div>
         </div>
@@ -303,6 +332,8 @@ const props = defineProps({
   stats_data: Object,
   todays_meetings: { type: Array, default: () => [] },
   pending_appointments: { type: Array, default: () => [] },
+  blocked_dates: { type: Array, default: () => [] },
+  monthly_meetings: { type: Array, default: () => [] },
 });
 
 // Time
@@ -323,12 +354,12 @@ onMounted(() => {
 
 onUnmounted(() => clearInterval(timer));
 
-// Stats - Government official meeting stats only
+// Stats
 const stats = computed(() => [
-  { label: "Today's Meetings", value: props.stats_data?.today_appointments || 0, trend: 20, borderColor: 'border-l-blue-500', iconBg: 'bg-blue-50', iconColor: 'text-blue-500', icon: 'CalendarIcon' },
-  { label: 'Pending Approval', value: props.stats_data?.pending || 0, trend: 0, borderColor: 'border-l-amber-500', iconBg: 'bg-amber-50', iconColor: 'text-amber-500', icon: 'ClockIcon' },
-  { label: 'Cancelled', value: props.stats_data?.cancelled || 0, trend: -20, borderColor: 'border-l-gray-400', iconBg: 'bg-gray-50', iconColor: 'text-gray-500', icon: 'XCircleIcon' },
-  { label: 'Walk-in', value: props.stats_data?.walkins || 0, trend: 15, borderColor: 'border-l-orange-500', iconBg: 'bg-orange-50', iconColor: 'text-orange-500', icon: 'UserIcon' },
+  { label: "Today's Meetings", value: props.stats_data?.today_meetings || 0, trend: 20, borderColor: 'border-l-blue-500', iconBg: 'bg-blue-50', iconColor: 'text-blue-500', icon: 'CalendarIcon' },
+  { label: 'Pending Approval', value: props.stats_data?.pending_appointments || 0, trend: 0, borderColor: 'border-l-amber-500', iconBg: 'bg-amber-50', iconColor: 'text-amber-500', icon: 'ClockIcon' },
+  { label: 'This Week', value: props.stats_data?.this_week_meetings || 0, trend: 15, borderColor: 'border-l-green-500', iconBg: 'bg-green-50', iconColor: 'text-green-500', icon: 'ChartBarIcon' },
+  { label: 'This Month', value: props.stats_data?.this_month_meetings || 0, trend: 10, borderColor: 'border-l-purple-500', iconBg: 'bg-purple-50', iconColor: 'text-purple-500', icon: 'ChartPieIcon' },
 ]);
 
 // Calendar
@@ -336,6 +367,11 @@ const calendarView = ref('month');
 const selectedDate = ref(new Date());
 const currentMonth = ref(new Date());
 const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+// Hover state
+const hoveredDate = ref(null);
+const hoverPosition = ref({ x: 0, y: 0 });
+const hoveredEvents = ref([]);
 
 const calendarTitle = computed(() => {
   return currentMonth.value.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -345,6 +381,12 @@ const selectedDateTitle = computed(() => {
   return selectedDate.value.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 });
 
+// Filter meetings for the selected date
+const selectedDateMeetings = computed(() => {
+    const dateStr = selectedDate.value.toISOString().split('T')[0];
+    return props.monthly_meetings.filter(m => m.start.startsWith(dateStr));
+});
+
 const calendarDays = computed(() => {
   const year = currentMonth.value.getFullYear();
   const month = currentMonth.value.getMonth();
@@ -352,7 +394,6 @@ const calendarDays = computed(() => {
   const lastDay = new Date(year, month + 1, 0);
   const days = [];
   
-  // Get day of week (0 = Sunday, convert to Monday start)
   let startDay = firstDay.getDay() - 1;
   if (startDay < 0) startDay = 6;
   
@@ -366,7 +407,8 @@ const calendarDays = computed(() => {
       isCurrentMonth: false,
       isToday: false,
       isSelected: false,
-      events: []
+      events: [],
+      isBlocked: false
     });
   }
   
@@ -374,11 +416,15 @@ const calendarDays = computed(() => {
   const today = new Date();
   for (let i = 1; i <= lastDay.getDate(); i++) {
     const d = new Date(year, month, i);
+    const dateStr = d.toISOString().split('T')[0];
     const isToday = d.toDateString() === today.toDateString();
     const isSelected = d.toDateString() === selectedDate.value.toDateString();
     
-    // Mock events
-    const events = i % 3 === 0 ? [{ type: 'meeting' }] : i % 5 === 0 ? [{ type: 'appointment' }, { type: 'task' }] : [];
+    // Real events
+    const events = props.monthly_meetings.filter(m => m.start.startsWith(dateStr));
+    
+    // Blocked status
+    const isBlocked = props.blocked_dates.some(bd => bd.blocked_date === dateStr);
     
     days.push({
       key: `curr-${i}`,
@@ -387,7 +433,8 @@ const calendarDays = computed(() => {
       isCurrentMonth: true,
       isToday,
       isSelected,
-      events
+      events,
+      isBlocked
     });
   }
   
@@ -402,7 +449,8 @@ const calendarDays = computed(() => {
       isCurrentMonth: false,
       isToday: false,
       isSelected: false,
-      events: []
+      events: [],
+      isBlocked: false
     });
   }
   
@@ -423,8 +471,24 @@ const selectDate = (date) => {
 
 const closeSchedule = () => {};
 
-// Today's meetings
-const todaysMeetings = computed(() => props.todays_meetings || []);
+// Hover Logic
+const handleMouseEnter = (event, date) => {
+    if ((date.events && date.events.length > 0) || date.isBlocked) {
+        hoveredDate.value = date;
+        const rect = event.target.getBoundingClientRect();
+        hoverPosition.value = {
+            x: rect.left + window.scrollX + (rect.width / 2),
+            y: rect.top + window.scrollY - 10 
+        };
+        hoveredEvents.value = date.events;
+    }
+};
+
+const handleMouseLeave = () => {
+    hoveredDate.value = null;
+    hoveredEvents.value = [];
+};
+
 
 // Helpers
 const formatTime = (dt) => {
@@ -451,7 +515,7 @@ const getEventDotColor = (type) => ({
   meeting: 'bg-blue-500',
   appointment: 'bg-blue-500',
   task: 'bg-green-500'
-}[type] || 'bg-gray-400');
+}[type] || 'bg-blue-500');
 
 const getStatusBadge = (status) => ({
   scheduled: 'bg-blue-100 text-blue-700',
@@ -469,7 +533,6 @@ const getStatusLabel = (status) => ({
   pending: 'Pending'
 }[status] || status);
 
-// Actions
 const approveRequest = (id) => {
   if (confirm('Approve this appointment request?')) {
     router.post(`/appointments/${id}/approve`);

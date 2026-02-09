@@ -19,10 +19,10 @@
         
         <div class="header-right">
           <div class="datetime">
-            <div class="time">{{ currentTime }}</div>
-            <div class="date">{{ currentDate }}</div>
+            <div class="time text-lg">{{ currentTime }}</div>
+            <div class="date text-xs">{{ currentDate }}</div>
           </div>
-          <img src="/images/directorprofile.png" alt="Director" class="director-photo" />
+          <img src="/images/directorprofile.png" alt="Director" class="director-photo w-10 h-10" />
         </div>
       </div>
     </header>
@@ -44,13 +44,16 @@
             </div>
             
             <!-- Date Navigator -->
-            <div class="date-navigator">
+            <div class="date-navigator" :class="{'bg-red-50 border border-red-100': isDateBlocked}">
               <button @click="changeDate(-1)" class="nav-btn">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
               </button>
-              <div class="selected-date">{{ selectedDateFormatted }}</div>
+              <div class="text-center">
+                <div class="selected-date">{{ selectedDateFormatted }}</div>
+                <div v-if="isDateBlocked" class="text-[10px] text-red-500 font-bold uppercase tracking-wide">Date Blocked</div>
+              </div>
               <button @click="changeDate(1)" class="nav-btn">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
               </button>
             </div>
             
@@ -79,7 +82,8 @@
               </div>
               
               <div v-else class="empty-slots">
-                <p>No slots available for this date</p>
+                <p v-if="isDateBlocked">This date is unavailable for meetings.</p>
+                <p v-else>No slots available for this date</p>
               </div>
             </div>
           </div>
@@ -191,8 +195,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+
+const props = defineProps({
+  director: Object,
+  lab: Object,
+  blockedDates: { type: Array, default: () => [] },
+  existingMeetings: { type: Array, default: () => [] },
+});
 
 // Time
 const currentTime = ref('');
@@ -217,21 +228,63 @@ const selectedDateFormatted = computed(() => {
   return selectedDate.value.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 });
 
+const isDateBlocked = computed(() => {
+  const dateStr = selectedDate.value.toISOString().split('T')[0];
+  return props.blockedDates.some(d => d.blocked_date === dateStr);
+});
+
 const generateSlots = async () => {
   loadingSlots.value = true;
-  await new Promise(r => setTimeout(r, 500));
+  // Simulate delay for feel, or remove if instant
+  await new Promise(r => setTimeout(r, 300));
   
+  if (isDateBlocked.value) {
+    slots.value = [];
+    loadingSlots.value = false;
+    return;
+  }
+
   const times = ['09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM', '02:30 PM', '03:00 PM', '03:30 PM', '04:00 PM', '04:30 PM'];
-  slots.value = times.map(time => ({
-    time,
-    available: Math.random() > 0.3
-  }));
+  const dateStr = selectedDate.value.toISOString().split('T')[0];
+
+  slots.value = times.map(time => {
+    // Convert slot time to Date object for comparison
+    const slotTime = new Date(`${dateStr} ${time}`);
+    // Simple check: is this slot overlapping with any existing meeting?
+    // We assume meetings have start/end in ISO string
+    
+    // Parse time to comparable value (minutes from start of day)
+    const [timePart, modifier] = time.split(' ');
+    let [hours, minutes] = timePart.split(':');
+    if (hours === '12') hours = '00';
+    if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
+    
+    // Create date objects for this slot (30 min duration assumed default)
+    const slotStart = new Date(selectedDate.value);
+    slotStart.setHours(hours, minutes, 0, 0);
+    const slotEnd = new Date(slotStart);
+    slotEnd.setMinutes(slotEnd.getMinutes() + 30);
+
+    const isTaken = props.existingMeetings.some(meeting => {
+        const meetingStart = new Date(meeting.start);
+        const meetingEnd = new Date(meeting.end);
+        // Overlap check
+        return (slotStart < meetingEnd && slotEnd > meetingStart);
+    });
+
+    return {
+      time,
+      available: !isTaken
+    };
+  });
+  
   loadingSlots.value = false;
 };
 
 const changeDate = (days) => {
   const newDate = new Date(selectedDate.value);
   newDate.setDate(newDate.getDate() + days);
+  // Prevent going to past
   if (newDate >= new Date().setHours(0,0,0,0)) {
     selectedDate.value = newDate;
     form.preferred_date = newDate.toISOString().split('T')[0];
@@ -249,6 +302,9 @@ const selectSlot = (slot) => {
 onMounted(() => {
   generateSlots();
 });
+
+// Re-generate if props change (though typically they are static for the page load, but good practice)
+watch(() => props.existingMeetings, generateSlots);
 
 // Form
 const form = useForm({
@@ -275,6 +331,10 @@ const resetForm = () => {
   showSuccess.value = false;
   form.reset();
   form.preferred_time = '';
+  // Reset date to today
+  selectedDate.value = new Date();
+  form.preferred_date = selectedDate.value.toISOString().split('T')[0];
+  generateSlots();
 };
 </script>
 
@@ -336,9 +396,8 @@ const resetForm = () => {
 }
 
 .header-content {
-  max-width: 1400px;
   margin: 0 auto;
-  padding: 16px 32px;
+  padding: 12px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -402,7 +461,7 @@ const resetForm = () => {
 .main-content {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 32px;
+  padding: 20px;
   position: relative;
   z-index: 10;
 }
@@ -431,8 +490,8 @@ const resetForm = () => {
 
 .card-header {
   display: flex;
-  gap: 16px;
-  padding: 24px;
+  gap: 12px;
+  padding: 16px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -506,7 +565,7 @@ const resetForm = () => {
 
 /* Slots */
 .slots-container {
-  padding: 0 24px 24px;
+  padding: 0 16px 16px;
 }
 
 .slots-grid {
@@ -627,7 +686,7 @@ const resetForm = () => {
 }
 
 .form-header {
-  padding: 24px;
+  padding: 16px;
   background: linear-gradient(135deg, #1565c0, #42a5f5);
   color: white;
 }
@@ -645,10 +704,10 @@ const resetForm = () => {
 }
 
 .request-form {
-  padding: 24px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 
 .form-row {
@@ -671,7 +730,7 @@ const resetForm = () => {
 
 .form-input {
   width: 100%;
-  padding: 14px 16px;
+  padding: 10px 12px;
   border: 2px solid #e0e0e0;
   border-radius: 14px;
   font-size: 0.9rem;

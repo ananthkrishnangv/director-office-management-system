@@ -17,9 +17,28 @@ class PublicMeetingController extends Controller
         // Assuming single lab for now, or fetch based on domain/subdomain
         $lab = $director ? $director->lab : null;
 
+        // Get blocked dates (future only)
+        $blockedDates = \App\Models\BlockedDate::forDirector($director ? $director->id : 0)
+            ->where('blocked_date', '>=', now()->toDateString())
+            ->get();
+
+        // Get existing meetings for availability check (next 30 days)
+        $existingMeetings = MeetingSchedule::forDirector($director ? $director->id : 0)
+            ->whereBetween('start_time', [now(), now()->addDays(30)])
+            ->active()
+            ->get()
+            ->map(function ($meeting) {
+                return [
+                    'start' => $meeting->start_time->toIso8601String(),
+                    'end' => $meeting->end_time->toIso8601String(),
+                ];
+            });
+
         return Inertia::render('Public/MeetingRequest', [
             'director' => $director ? $director->only('name', 'email') : null,
             'lab' => $lab,
+            'blockedDates' => $blockedDates,
+            'existingMeetings' => $existingMeetings,
         ]);
     }
 

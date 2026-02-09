@@ -55,6 +55,27 @@ class DashboardController extends Controller
         // Get today's logbook
         $todayLogbook = DailyLogbook::getOrCreateForToday($directorId, $user->id);
 
+        // Get blocked dates for the current and next month
+        $blockedDates = \App\Models\BlockedDate::forDirector($directorId)
+            ->whereBetween('blocked_date', [now()->startOfMonth()->subWeek(), now()->addMonth()->endOfMonth()])
+            ->get();
+
+        // Get monthly meetings for calendar (current month +/- buffer)
+        $monthlyMeetings = MeetingSchedule::forDirector($directorId)
+            ->whereBetween('start_time', [now()->startOfMonth()->subWeek(), now()->addMonth()->endOfMonth()])
+            ->active()
+            ->get()
+            ->map(function ($meeting) {
+                return array_merge($meeting->toCalendarEvent(), [
+                    'extendedProps' => [
+                        'description' => $meeting->description,
+                        'status' => $meeting->status,
+                        'attendees' => $meeting->attendees,
+                        'location' => $meeting->location,
+                    ]
+                ]);
+            });
+
         // Get notifications for ticker
         $notifications = $this->getRecentNotifications($directorId);
 
@@ -66,6 +87,8 @@ class DashboardController extends Controller
             'todos' => $todos,
             'todayLogbook' => $todayLogbook,
             'notifications' => $notifications,
+            'blockedDates' => $blockedDates,
+            'monthlyMeetings' => $monthlyMeetings,
         ]);
     }
 
