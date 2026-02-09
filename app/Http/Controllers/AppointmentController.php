@@ -167,13 +167,14 @@ class AppointmentController extends Controller
         $meeting = $this->createMeetingFromAppointment($appointment);
 
         // Send notification
-        $this->notificationService->sendApprovalNotification($appointment);
+        try {
+            $this->notificationService->sendApprovalNotification($appointment);
+        } catch (\Exception $e) {
+            \Log::error('Notification failed: ' . $e->getMessage());
+            return redirect()->back()->with('success', 'Appointment approved successfully (Email notification failed)');
+        }
 
-        return response()->json([
-            'message' => 'Appointment approved successfully',
-            'appointment' => $appointment->fresh(),
-            'meeting' => $meeting,
-        ]);
+        return redirect()->back()->with('success', 'Appointment approved successfully');
     }
 
     /**
@@ -183,9 +184,7 @@ class AppointmentController extends Controller
     {
 
         if (!$appointment->isPending()) {
-            return response()->json([
-                'message' => 'Only pending appointments can be rejected',
-            ], 422);
+            return redirect()->back()->with('error', 'Only pending appointments can be rejected');
         }
 
         $validated = $request->validate([
@@ -201,12 +200,14 @@ class AppointmentController extends Controller
         }
 
         // Send notification
-        $this->notificationService->sendRejectionNotification($appointment);
+        try {
+            $this->notificationService->sendRejectionNotification($appointment);
+        } catch (\Exception $e) {
+            \Log::error('Notification failed: ' . $e->getMessage());
+            return redirect()->back()->with('success', 'Appointment rejected (Email notification failed)');
+        }
 
-        return response()->json([
-            'message' => 'Appointment rejected',
-            'appointment' => $appointment->fresh(),
-        ]);
+        return redirect()->back()->with('success', 'Appointment rejected');
     }
 
     /**

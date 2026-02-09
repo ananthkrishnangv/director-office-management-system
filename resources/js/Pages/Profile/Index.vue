@@ -9,7 +9,7 @@
 
       <div class="grid gap-6">
         <!-- Profile Information Card -->
-        <div class="fluent-card p-6">
+        <div class="card bg-base-100 shadow-xl border border-base-200 p-6">
           <div class="flex items-center gap-4 mb-6">
             <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
               <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -25,51 +25,51 @@
           <form @submit.prevent="updateProfile" class="space-y-5">
             <div class="grid md:grid-cols-2 gap-5">
               <!-- Name -->
-              <div class="form-group">
-                <label class="form-label">Full Name</label>
+              <div class="form-control w-full">
+                <label class="label"><span class="label-text font-semibold">Full Name</span></label>
                 <input 
                   type="text" 
                   v-model="profileForm.name" 
-                  class="fluent-input"
+                  class="input input-bordered w-full"
                   placeholder="Your full name"
                 />
-                <p v-if="profileForm.errors.name" class="error-text">{{ profileForm.errors.name }}</p>
+                <p v-if="profileForm.errors.name" class="text-error text-xs mt-1">{{ profileForm.errors.name }}</p>
               </div>
 
               <!-- Email -->
-              <div class="form-group">
-                <label class="form-label">Email Address</label>
+              <div class="form-control w-full">
+                <label class="label"><span class="label-text font-semibold">Email Address</span></label>
                 <input 
                   type="email" 
                   v-model="profileForm.email" 
-                  class="fluent-input"
+                  class="input input-bordered w-full"
                   placeholder="your.email@serc.res.in"
                 />
-                <p v-if="profileForm.errors.email" class="error-text">{{ profileForm.errors.email }}</p>
+                <p v-if="profileForm.errors.email" class="text-error text-xs mt-1">{{ profileForm.errors.email }}</p>
               </div>
 
               <!-- Phone -->
-              <div class="form-group">
-                <label class="form-label">Phone Number</label>
+              <div class="form-control w-full">
+                <label class="label"><span class="label-text font-semibold">Phone Number</span></label>
                 <input 
                   type="tel" 
                   v-model="profileForm.phone" 
-                  class="fluent-input"
+                  class="input input-bordered w-full"
                   placeholder="+91 9876543210"
                 />
-                <p v-if="profileForm.errors.phone" class="error-text">{{ profileForm.errors.phone }}</p>
+                <p v-if="profileForm.errors.phone" class="text-error text-xs mt-1">{{ profileForm.errors.phone }}</p>
               </div>
 
               <!-- Department -->
-              <div class="form-group">
-                <label class="form-label">Department</label>
+              <div class="form-control w-full">
+                <label class="label"><span class="label-text font-semibold">Department</span></label>
                 <input 
                   type="text" 
                   v-model="profileForm.department" 
-                  class="fluent-input"
+                  class="input input-bordered w-full"
                   placeholder="Your department"
                 />
-                <p v-if="profileForm.errors.department" class="error-text">{{ profileForm.errors.department }}</p>
+                <p v-if="profileForm.errors.department" class="text-error text-xs mt-1">{{ profileForm.errors.department }}</p>
               </div>
             </div>
 
@@ -77,7 +77,7 @@
               <button 
                 type="submit" 
                 :disabled="profileForm.processing"
-                class="btn btn-primary"
+                class="btn btn-primary text-white"
               >
                 <svg v-if="profileForm.processing" class="w-4 h-4 animate-spin mr-2" viewBox="0 0 24 24">
                   <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" class="opacity-25" />
@@ -263,17 +263,3 @@ const formatDate = (dateStr) => {
   });
 };
 </script>
-
-<style scoped>
-.form-group {
-  @apply flex flex-col gap-1.5;
-}
-
-.form-label {
-  @apply text-sm font-semibold text-neutral-700;
-}
-
-.error-text {
-  @apply text-xs text-red-500 font-medium;
-}
-</style>

@@ -1,227 +1,51 @@
-/* Import Inter font for headings */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Noto+Sans:wght@400;500;600&display=swap');
+@import "tailwindcss";
+@plugin "daisyui";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-  html {
-    font-family: 'Noto Sans', system-ui, sans-serif;
-  }
-
-  body {
-    @apply antialiased text-neutral-700;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  }
-
-  /* Headings use Inter */
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: 'Inter', system-ui, sans-serif;
-  }
-
-  h1 {
-    @apply text-2xl font-extrabold;
-  }
-
-  h2 {
-    @apply text-xl font-bold;
-  }
-
-  h3 {
-    @apply text-lg font-semibold;
-  }
-
-  h4 {
-    @apply text-base font-semibold;
-  }
+@theme {
+  --font-sans: 'Noto Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-heading: 'Inter', 'Segoe UI', system-ui, sans-serif;
 }
 
-@layer components {
+/* Custom Fluent UI Utilities (if not covered by DaisyUI) */
+@utility fluent-shadow {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 0 2px rgba(0, 0, 0, 0.08);
+}
 
-  /* Fluent UI Card with Glassmorphism */
-  .fluent-card {
-    @apply bg-white/90 rounded-2xl border border-white/60;
-    box-shadow:
-      0 4px 24px rgba(0, 0, 0, 0.04),
-      0 1px 2px rgba(0, 0, 0, 0.06);
-    backdrop-filter: blur(8px);
-    transition: all 0.3s ease;
-  }
+@utility fluent-shadow-lg {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 4px rgba(0, 0, 0, 0.08);
+}
 
-  .fluent-card:hover {
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.08),
-      0 2px 4px rgba(0, 0, 0, 0.04);
-    transform: translateY(-1px);
-  }
+/* Base styles */
+html {
+  font-family: var(--font-sans);
+}
 
-  /* Fluent UI Inputs */
-  .fluent-input {
-    @apply w-full px-4 py-3 bg-white/80 border border-neutral-200/80 rounded-xl text-neutral-800;
-    @apply focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all;
-    @apply placeholder:text-neutral-400;
-    backdrop-filter: blur(4px);
-  }
+body {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
 
-  .fluent-select {
-    @apply w-full px-4 py-3 bg-white/80 border border-neutral-200/80 rounded-xl text-neutral-800;
-    @apply focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all appearance-none;
-    backdrop-filter: blur(4px);
-  }
+/* Typography Overrides */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
 
-  /* Buttons with Fluent UI style */
-  .btn {
-    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-semibold transition-all duration-200;
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
-    font-family: 'Inter', system-ui, sans-serif;
-  }
+/* Navigation - customized for the sidebar */
+.nav-item {
+  @apply flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium text-base-content/70 hover:bg-base-200 hover:text-base-content;
+}
 
-  .btn-primary {
-    @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 focus:ring-blue-500;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
-  }
+.nav-item-active {
+  @apply bg-primary/10 text-primary font-bold;
+}
 
-  .btn-primary:hover {
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
-    transform: translateY(-1px);
-  }
-
-  .btn-secondary {
-    @apply bg-white/80 text-neutral-700 border border-neutral-200 hover:bg-white focus:ring-neutral-400;
-    backdrop-filter: blur(4px);
-  }
-
-  .btn-success {
-    @apply bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 focus:ring-green-500;
-    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.25);
-  }
-
-  .btn-danger {
-    @apply bg-white text-red-600 border border-red-200 hover:bg-red-50 focus:ring-red-500;
-  }
-
-  /* Status Badges */
-  .badge {
-    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold;
-    font-family: 'Inter', system-ui, sans-serif;
-  }
-
-  .badge-pending {
-    @apply bg-amber-100 text-amber-700;
-  }
-
-  .badge-approved {
-    @apply bg-green-100 text-green-700;
-  }
-
-  .badge-rejected {
-    @apply bg-red-100 text-red-700;
-  }
-
-  .badge-scheduled {
-    @apply bg-blue-100 text-blue-700;
-  }
-
-  /* Navigation */
-  .nav-item {
-    @apply flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium;
-  }
-
-  .nav-item-active {
-    @apply bg-blue-50/80 text-blue-600;
-    box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.1);
-  }
-
-  .nav-item-inactive {
-    @apply text-neutral-600 hover:bg-neutral-50/80 hover:text-neutral-800;
-  }
-
-  /* Table Styles */
-  .fluent-table {
-    @apply w-full text-sm;
-  }
-
-  .fluent-table th {
-    @apply px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wide bg-neutral-50/80 border-b border-neutral-200;
-    font-family: 'Inter', system-ui, sans-serif;
-  }
-
-  .fluent-table td {
-    @apply px-4 py-4 border-b border-neutral-100;
-  }
-
-  .fluent-table tbody tr:hover {
-    @apply bg-neutral-50/50;
-  }
-
-  /* Custom Scrollbar */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-neutral-100/50 rounded;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-neutral-300 rounded hover:bg-neutral-400;
-  }
-
-  /* Empty State */
-  .empty-state {
-    @apply flex flex-col items-center justify-center py-12 text-neutral-400;
-  }
-
-  .empty-state-icon {
-    @apply w-16 h-16 mb-4 opacity-50;
-  }
-
-  /* Stats Card - Enhanced */
-  .stat-card {
-    @apply fluent-card p-5 border-l-4;
-  }
-
-  .stat-card-value {
-    @apply text-3xl font-bold text-neutral-800;
-    font-family: 'Inter', system-ui, sans-serif;
-  }
-
-  .stat-card-label {
-    @apply text-xs text-neutral-500 font-medium uppercase tracking-wide;
-    font-family: 'Inter', system-ui, sans-serif;
-  }
-
-  .stat-card-trend {
-    @apply flex items-center gap-1 text-xs font-medium mt-2;
-  }
-
-  .stat-card-trend-up {
-    @apply text-green-600;
-  }
-
-  .stat-card-trend-down {
-    @apply text-red-600;
-  }
-
-  /* Glassmorphism utilities */
-  .glass {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-  }
-
-  .glass-dark {
-    background: rgba(30, 41, 59, 0.85);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
+/* Table */
+.fluent-table {
+  @apply table w-full;
 }
 
 /* Animations */
@@ -235,61 +59,6 @@
   }
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-
-  100% {
-    background-position: 200% 0;
-  }
-}
-
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out;
-}
-
-.animate-slide-up {
-  animation: slideUp 0.3s ease-out;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.2s ease-out;
-}
-
-.animate-shimmer {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-/* Print Styles */
-@media print {
-  .no-print {
-    display: none !important;
-  }
 }

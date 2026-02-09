@@ -17,7 +17,7 @@
       <!-- Meeting Form -->
       <form @submit.prevent="submitForm" class="space-y-6">
         <!-- Basic Info Card -->
-        <div class="fluent-card">
+        <div class="card bg-base-100 shadow-xl border border-base-200 p-6">
           <h2 class="text-lg font-semibold text-neutral-800 mb-4 flex items-center gap-2">
             <span class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -30,19 +30,19 @@
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-neutral-700 mb-1">Title *</label>
-              <input v-model="form.title" type="text" required class="fluent-input w-full" placeholder="Enter meeting title" />
-              <p v-if="errors.title" class="text-red-500 text-sm mt-1">{{ errors.title }}</p>
+              <input v-model="form.title" type="text" required class="input input-bordered w-full" placeholder="Enter meeting title" />
+              <p v-if="errors.title" class="text-error text-sm mt-1">{{ errors.title }}</p>
             </div>
 
             <div>
               <label class="block text-sm font-medium text-neutral-700 mb-1">Description</label>
-              <textarea v-model="form.description" rows="3" class="fluent-input w-full" placeholder="Describe the purpose of the meeting"></textarea>
+              <textarea v-model="form.description" rows="3" class="textarea textarea-bordered w-full" placeholder="Describe the purpose of the meeting"></textarea>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-neutral-700 mb-1">Meeting Type *</label>
-                <select v-model="form.meeting_type" required class="fluent-select w-full">
+                <select v-model="form.meeting_type" required class="select select-bordered w-full">
                   <option value="">Select type</option>
                   <option value="one_on_one">One on One</option>
                   <option value="team">Team Meeting</option>
@@ -55,7 +55,7 @@
 
               <div>
                 <label class="block text-sm font-medium text-neutral-700 mb-1">Priority</label>
-                <select v-model="form.priority" class="fluent-select w-full">
+                <select v-model="form.priority" class="select select-bordered w-full">
                   <option value="normal">Normal</option>
                   <option value="low">Low</option>
                   <option value="high">High</option>
@@ -67,7 +67,7 @@
         </div>
 
         <!-- Date & Time Card -->
-        <div class="fluent-card">
+        <div class="card bg-base-100 shadow-xl border border-base-200 p-6">
           <h2 class="text-lg font-semibold text-neutral-800 mb-4 flex items-center gap-2">
             <span class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,25 +79,25 @@
 
           <div class="space-y-4">
             <div class="flex items-center gap-3">
-              <input type="checkbox" v-model="form.is_all_day" id="allDay" class="w-4 h-4 text-primary-500 rounded" />
+              <input type="checkbox" v-model="form.is_all_day" id="allDay" class="checkbox checkbox-primary" />
               <label for="allDay" class="text-sm text-neutral-700">All day event</label>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-neutral-700 mb-1">Start Date & Time *</label>
-                <input v-model="form.start_time" :type="form.is_all_day ? 'date' : 'datetime-local'" required class="fluent-input w-full" />
+                <input v-model="form.start_time" :type="form.is_all_day ? 'date' : 'datetime-local'" required class="input input-bordered w-full" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-neutral-700 mb-1">End Date & Time *</label>
-                <input v-model="form.end_time" :type="form.is_all_day ? 'date' : 'datetime-local'" required class="fluent-input w-full" />
+                <input v-model="form.end_time" :type="form.is_all_day ? 'date' : 'datetime-local'" required class="input input-bordered w-full" />
               </div>
             </div>
           </div>
         </div>
 
         <!-- Location Card -->
-        <div class="fluent-card">
+        <div class="card bg-base-100 shadow-xl border border-base-200 p-6">
           <h2 class="text-lg font-semibold text-neutral-800 mb-4 flex items-center gap-2">
             <span class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,24 +111,24 @@
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-neutral-700 mb-1">Location/Venue</label>
-              <input v-model="form.location" type="text" class="fluent-input w-full" placeholder="e.g., Director's Office, Conference Room" />
+              <input v-model="form.location" type="text" class="input input-bordered w-full" placeholder="e.g., Director's Office, Conference Room" />
             </div>
 
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-neutral-700 mb-1">Room Number</label>
-                <input v-model="form.room_number" type="text" class="fluent-input w-full" placeholder="e.g., 101" />
+                <input v-model="form.room_number" type="text" class="input input-bordered w-full" placeholder="e.g., 101" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-neutral-700 mb-1">Online Meeting Link</label>
-                <input v-model="form.online_link" type="url" class="fluent-input w-full" placeholder="https://meet.google.com/..." />
+                <input v-model="form.online_link" type="url" class="input input-bordered w-full" placeholder="https://meet.google.com/..." />
               </div>
             </div>
           </div>
         </div>
 
         <!-- Notes Card -->
-        <div class="fluent-card">
+        <div class="card bg-base-100 shadow-xl border border-base-200 p-6">
           <h2 class="text-lg font-semibold text-neutral-800 mb-4 flex items-center gap-2">
             <span class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,13 +138,13 @@
             Additional Notes
           </h2>
 
-          <textarea v-model="form.notes" rows="4" class="fluent-input w-full" placeholder="Any additional notes or preparation required..."></textarea>
+          <textarea v-model="form.notes" rows="4" class="textarea textarea-bordered w-full" placeholder="Any additional notes or preparation required..."></textarea>
         </div>
 
         <!-- Submit Buttons -->
         <div class="flex justify-end gap-3">
-          <a href="/meetings" class="btn btn-secondary">Cancel</a>
-          <button type="submit" class="btn btn-primary" :disabled="processing">
+          <a href="/meetings" class="btn btn-neutral btn-outline">Cancel</a>
+          <button type="submit" class="btn btn-primary text-white" :disabled="processing">
             <span v-if="processing" class="flex items-center gap-2">
               <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
@@ -205,15 +205,3 @@ const submitForm = () => {
   });
 };
 </script>
-
-<style scoped>
-.fluent-card {
-  @apply bg-white rounded-2xl p-6 shadow-sm;
-}
-.fluent-input {
-  @apply px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:bg-white outline-none transition-all;
-}
-.fluent-select {
-  @apply px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:bg-white outline-none transition-all;
-}
-</style>

@@ -1,196 +1,294 @@
 <template>
-  <div class="meeting-request-wrapper">
-    <!-- Animated Background -->
-    <div class="bg-effects">
-      <div class="blob blob-1"></div>
-      <div class="blob blob-2"></div>
-    </div>
-    
+  <div class="min-h-screen bg-neutral-50 font-sans text-gray-800 selection:bg-blue-100 selection:text-blue-900">
     <!-- Header -->
-    <header class="request-header">
-      <div class="header-content">
-        <div class="header-left">
-          <img src="/images/udomslogo.png" alt="UDOMS" class="logo" />
-          <div class="title-group">
-            <h1>Unified Director Office</h1>
-            <p>Management System</p>
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <img src="/images/udomslogo.png" alt="CSIR" class="h-10 w-auto" />
+          <div class="hidden md:block h-8 w-px bg-gray-200"></div>
+          <div>
+             <h1 class="text-lg font-bold text-gray-900 leading-tight">Public Appointment Portal</h1>
+             <p class="text-xs text-gray-500 font-medium">CSIR-Structural Engineering Research Centre</p>
           </div>
         </div>
         
-        <div class="header-right">
-          <div class="datetime">
-            <div class="time text-lg">{{ currentTime }}</div>
-            <div class="date text-xs">{{ currentDate }}</div>
+        <div class="flex items-center gap-6">
+          <div class="text-right hidden sm:block">
+            <div class="text-sm font-semibold text-gray-900 font-mono">{{ currentTime }}</div>
+            <div class="text-xs text-gray-500">{{ currentDate }}</div>
           </div>
-          <img src="/images/directorprofile.png" alt="Director" class="director-photo w-10 h-10" />
+          <div v-if="director" class="flex items-center gap-3 pl-6 border-l border-gray-200">
+             <img src="/images/directorprofile.png" alt="Director" class="h-10 w-10 rounded-full object-cover border-2 border-white shadow-sm ring-1 ring-gray-100" />
+             <div class="hidden md:block">
+                <p class="text-xs font-bold text-gray-900 uppercase tracking-wider">Director's Office</p>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                  <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  </span>
+                  <p class="text-[10px] font-medium text-gray-500">Approving Requests</p>
+                </div>
+             </div>
+          </div>
         </div>
       </div>
     </header>
-    
-    <!-- Main Content -->
-    <main class="main-content">
-      <div class="content-grid">
-        <!-- Left: Availability Calendar -->
-        <div class="availability-section">
-          <div class="glass-card">
-            <div class="card-header">
-              <div class="header-icon purple">
-                <svg fill="currentColor" viewBox="0 0 20 20"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/></svg>
-              </div>
-              <div>
-                <h2>Director's Availability</h2>
-                <p>Select a date to view available time slots</p>
-              </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      
+      <!-- Success Message Overlay -->
+      <transition name="fade">
+        <div v-if="showSuccess" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4">
+          <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center transform transition-all scale-100 border border-gray-100">
+            <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-50 mb-6 ring-8 ring-green-50/50">
+              <svg class="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+              </svg>
             </div>
-            
-            <!-- Date Navigator -->
-            <div class="date-navigator" :class="{'bg-red-50 border border-red-100': isDateBlocked}">
-              <button @click="changeDate(-1)" class="nav-btn">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-              </button>
-              <div class="text-center">
-                <div class="selected-date">{{ selectedDateFormatted }}</div>
-                <div v-if="isDateBlocked" class="text-[10px] text-red-500 font-bold uppercase tracking-wide">Date Blocked</div>
-              </div>
-              <button @click="changeDate(1)" class="nav-btn">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-              </button>
-            </div>
-            
-            <!-- Time Slots -->
-            <div class="slots-container">
-              <div v-if="loadingSlots" class="loading-state">
-                <div class="spinner"></div>
-                <p>Loading slots...</p>
-              </div>
-              
-              <div v-else-if="slots.length > 0" class="slots-grid">
-                <button 
-                  v-for="slot in slots" 
-                  :key="slot.time"
-                  @click="selectSlot(slot)"
-                  :disabled="!slot.available"
-                  class="slot-btn"
-                  :class="{ 
-                    selected: slot.time === form.preferred_time,
-                    unavailable: !slot.available 
-                  }"
-                >
-                  {{ slot.time }}
-                  <span v-if="!slot.available" class="booked-label">Booked</span>
-                </button>
-              </div>
-              
-              <div v-else class="empty-slots">
-                <p v-if="isDateBlocked">This date is unavailable for meetings.</p>
-                <p v-else>No slots available for this date</p>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Contact Card -->
-          <div class="glass-card contact-card">
-            <h3>Need immediate assistance?</h3>
-            <p>Contact the Director's office directly for urgent requests.</p>
-            <a href="tel:+914422549201" class="phone-link">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-              +91 44 2254 9201
-            </a>
+            <h3 class="text-2xl font-bold text-gray-900 mb-3">Request Sent Successfully!</h3>
+            <p class="text-gray-500 mb-8 leading-relaxed">Your appointment request has been submitted to the Director's office. You will receive a confirmation email once the request is reviewed and approved.</p>
+            <button @click="resetForm" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg shadow-blue-600/20 active:scale-[0.98]">
+              Book Another Appointment
+            </button>
           </div>
         </div>
+      </transition>
+
+      <div class="grid lg:grid-cols-12 gap-8 items-start">
         
-        <!-- Right: Request Form -->
-        <div class="form-section">
-          <div class="glass-card form-card">
-            <div class="form-header">
-              <h2>Meeting Request Form</h2>
-              <p>Submit your request for a meeting with the Director</p>
+        <!-- Left Column: Calendar & Info -->
+        <div class="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
+          <!-- Calendar Card -->
+          <div class="bg-white rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-200 overflow-hidden">
+            <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+              <h2 class="text-lg font-bold text-gray-900">Select Date</h2>
+              <div class="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
+                <button @click="changeDate(-1)" class="p-1.5 hover:bg-gray-100 rounded-md transition-colors text-gray-600">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="w-px h-4 bg-gray-200"></div>
+                <button @click="changeDate(1)" class="p-1.5 hover:bg-gray-100 rounded-md transition-colors text-gray-600">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+              </div>
             </div>
             
-            <form @submit.prevent="submit" class="request-form">
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Full Name <span class="required">*</span></label>
-                  <input type="text" v-model="form.name" required placeholder="Dr. John Doe" class="form-input" />
-                  <p v-if="form.errors.name" class="field-error">{{ form.errors.name }}</p>
+            <div class="p-8 flex flex-col items-center justify-center border-b border-gray-50">
+               <div class="text-6xl font-black text-blue-600 mb-2 tracking-tighter">{{ selectedDate.getDate() }}</div>
+               <div class="text-gray-900 font-bold text-xl">{{ selectedDate.toLocaleString('default', { month: 'long', year: 'numeric' }) }}</div>
+               <div class="text-gray-400 font-medium mt-1 uppercase tracking-widest text-xs">{{ selectedDate.toLocaleDateString('en-US', { weekday: 'long' }) }}</div>
+            </div>
+
+            <div class="p-5">
+              <div v-if="isDateBlocked" class="bg-red-50 border border-red-100 rounded-xl p-4 flex items-center gap-3">
+                <div class="p-2 bg-red-100 rounded-lg shrink-0">
+                  <svg class="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </div>
-                <div class="form-group">
-                  <label>Organization <span class="required">*</span></label>
-                  <input type="text" v-model="form.organization" required placeholder="IIT Madras" class="form-input" />
-                </div>
-              </div>
-              
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Email Address <span class="required">*</span></label>
-                  <input type="email" v-model="form.email" required placeholder="john@example.com" class="form-input" />
-                  <p v-if="form.errors.email" class="field-error">{{ form.errors.email }}</p>
-                </div>
-                <div class="form-group">
-                  <label>Phone Number <span class="required">*</span></label>
-                  <input type="tel" v-model="form.phone" required placeholder="+91 98765 43210" class="form-input" />
+                <div>
+                  <p class="text-red-900 font-bold text-sm">Unavailable</p>
+                  <p class="text-red-600 text-xs">Date is blocked for meetings</p>
                 </div>
               </div>
-              
-              <div class="form-group">
-                <label>Purpose of Meeting <span class="required">*</span></label>
-                <input type="text" v-model="form.purpose" required placeholder="Brief subject (e.g., Research Collaboration)" class="form-input" />
+              <div v-else class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 flex items-center gap-3">
+                 <div class="p-2 bg-emerald-100 rounded-lg shrink-0">
+                    <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                 </div>
+                 <div>
+                   <p class="text-emerald-900 font-bold text-sm">Available</p>
+                   <p class="text-emerald-600 text-xs">{{ slots.filter(s => s.available).length }} time slots open</p>
+                 </div>
               </div>
-              
-              <div class="form-group">
-                <label>Detailed Description</label>
-                <textarea v-model="form.description" rows="3" placeholder="Provide more context..." class="form-input"></textarea>
-              </div>
-              
-              <!-- Selected Slot Summary -->
-              <div class="selection-summary">
-                <div class="summary-item">
-                  <span class="label">Selected Date</span>
-                  <span class="value">{{ selectedDateFormatted }}</span>
-                </div>
-                <div class="divider"></div>
-                <div class="summary-item">
-                  <span class="label">Selected Time</span>
-                  <span class="value" :class="{ placeholder: !form.preferred_time }">
-                    {{ form.preferred_time || 'Select a slot on the left' }}
-                  </span>
-                </div>
-              </div>
-              
-              <button 
-                type="submit" 
-                :disabled="form.processing || !form.preferred_time" 
-                class="submit-btn"
-              >
-                <span v-if="form.processing">Submitting...</span>
-                <span v-else>Submit Meeting Request</span>
-              </button>
-              
-              <p class="privacy-note">By submitting, you agree to our privacy policy.</p>
-            </form>
+            </div>
           </div>
+
+          <!-- Helper Info -->
+          <div class="bg-blue-600 rounded-2xl p-6 text-white shadow-lg shadow-blue-600/20 relative overflow-hidden group">
+             <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <svg class="w-24 h-24 transform rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+             </div>
+             <h3 class="font-bold text-lg mb-2 relative z-10">Need Assistance?</h3>
+             <p class="text-blue-100 text-sm mb-4 relative z-10 leading-relaxed">For urgent inquiries or special requests, please contact the Director's office directly.</p>
+             <div class="flex items-center gap-3 text-sm font-medium bg-blue-700/50 p-3 rounded-lg backdrop-blur-sm relative z-10 border border-blue-500/30">
+                <svg class="w-4 h-4 text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                <span>+91 44 2254 9201</span>
+             </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Slots & Form -->
+        <div class="lg:col-span-8 space-y-8">
+           
+           <!-- Slots Section -->
+           <div class="bg-white rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-200">
+              <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                 <h2 class="text-lg font-bold text-gray-900">Available Time Slots</h2>
+                 <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-md">IST (UTC+05:30)</span>
+              </div>
+              <div class="p-6">
+                 <div v-if="loadingSlots" class="flex flex-col items-center justify-center py-12 text-gray-400">
+                    <svg class="animate-spin h-8 w-8 text-blue-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="text-sm font-medium">Checking availability...</span>
+                 </div>
+                 
+                 <div v-else-if="slots.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    <button 
+                      v-for="slot in slots" 
+                      :key="slot.time"
+                      @click="selectSlot(slot)"
+                      :disabled="!slot.available"
+                      class="relative px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 border text-center group active:scale-[0.98]"
+                      :class="{
+                        'border-blue-500 bg-blue-600 text-white shadow-md shadow-blue-600/20': form.preferred_time === slot.time,
+                        'border-gray-200 hover:border-blue-400 hover:shadow-sm text-gray-700 bg-white hover:text-blue-600': slot.available && form.preferred_time !== slot.time,
+                        'border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed': !slot.available
+                      }"
+                    >
+                      {{ slot.time }}
+                      <div v-if="!slot.available" class="hidden group-hover:flex absolute -top-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-0.5 rounded shadow-sm whitespace-nowrap z-10">
+                         Already Booked
+                      </div>
+                    </button>
+                 </div>
+                 
+                 <div v-else class="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                    <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <p class="text-gray-500 font-medium">No time slots available for this date.</p>
+                    <p class="text-gray-400 text-sm mt-1">Please try selecting a different date.</p>
+                 </div>
+              </div>
+           </div>
+
+           <!-- Form Section -->
+           <div class="bg-white rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-200 scroll-mt-24 transition-opacity duration-300" id="requestForm" :class="{'opacity-50 pointer-events-none grayscale': !form.preferred_time}">
+              <div class="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                 <h2 class="text-xl font-bold text-gray-900">Meeting Details</h2>
+                 <p class="text-sm text-gray-500 mt-1">Please provide accurate information for quick approval.</p>
+              </div>
+              
+              <div class="p-8">
+                <form @submit.prevent="submit" class="space-y-8">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <div class="space-y-1.5">
+                      <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Full Name</label>
+                      <input 
+                        v-model="form.name" 
+                        type="text" 
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder-gray-400 text-gray-900 bg-white font-medium"
+                        placeholder="e.g. Dr. Jane Doe"
+                        required
+                      />
+                    </div>
+                    
+                    <div class="space-y-1.5">
+                      <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Email Address</label>
+                      <input 
+                        v-model="form.email" 
+                        type="email" 
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder-gray-400 text-gray-900 bg-white font-medium"
+                        placeholder="name@organization.com"
+                        required
+                      />
+                    </div>
+                    
+                    <div class="space-y-1.5">
+                      <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Phone Number</label>
+                      <input 
+                        v-model="form.phone" 
+                        type="tel" 
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder-gray-400 text-gray-900 bg-white font-medium"
+                        placeholder="+91 98765 43210"
+                        required
+                      />
+                    </div>
+                    
+                    <div class="space-y-1.5">
+                      <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Organization / Institute</label>
+                      <input 
+                        v-model="form.organization" 
+                        type="text" 
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder-gray-400 text-gray-900 bg-white font-medium"
+                        placeholder="Institute / Company Name"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Purpose of Meeting</label>
+                    <div class="relative">
+                        <select 
+                          v-model="form.purpose" 
+                          class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-gray-900 bg-white font-medium appearance-none"
+                          required
+                        >
+                          <option value="" disabled selected>Select a purpose...</option>
+                          <option value="Research Collaboration">Research Collaboration</option>
+                          <option value="Official Visit">Official Visit</option>
+                          <option value="Student Inquiry">Student Inquiry</option>
+                          <option value="Vendor Presentation">Vendor Presentation</option>
+                          <option value="Other">Other</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                    </div>
+                  </div>
+
+                  <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Agenda / Description</label>
+                    <textarea 
+                      v-model="form.description" 
+                      rows="4" 
+                      class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder-gray-400 text-gray-900 bg-white font-medium resize-none"
+                      placeholder="Please explicitly state the agenda and any other relevant details..."
+                    ></textarea>
+                  </div>
+
+                  <!-- Summary Box -->
+                  <div class="bg-blue-50 rounded-xl p-5 border border-blue-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                     <div class="flex items-center gap-4">
+                        <div class="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                           <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div>
+                           <p class="text-xs text-blue-500 font-bold uppercase tracking-wider">Confirmed Slot</p>
+                           <p class="text-blue-900 font-bold text-lg">{{ selectedDateFormatted }} <span class="mx-1 opacity-50">|</span> {{ form.preferred_time }}</p>
+                        </div>
+                     </div>
+                     <div class="flex gap-3 w-full sm:w-auto">
+                        <button 
+                          type="button" 
+                          @click="resetForm" 
+                          class="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:text-gray-900 border border-gray-200 bg-white rounded-lg hover:bg-gray-50 transition-colors w-full sm:w-auto"
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          type="submit" 
+                          :disabled="form.processing || !form.preferred_time"
+                          class="px-8 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform active:scale-[0.98] w-full sm:w-auto"
+                        >
+                          {{ form.processing ? 'Submitting...' : 'Confirm Request' }}
+                        </button>
+                     </div>
+                  </div>
+                </form>
+              </div>
+           </div>
+        
         </div>
       </div>
     </main>
     
-    <!-- Footer -->
-    <footer class="request-footer">
-      © 2026 CSIR-SERC. All rights reserved.
+    <footer class="bg-white border-t border-gray-200 mt-12 py-8">
+       <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-sm text-gray-500">&copy; {{ new Date().getFullYear() }} CSIR-Structural Engineering Research Centre. All rights reserved.</p>
+            <p class="text-xs text-gray-400 mt-2">Unified Director Office Management System</p>
+       </div>
     </footer>
-    
-    <!-- Success Modal -->
-    <div v-if="showSuccess" class="modal-overlay">
-      <div class="modal-card">
-        <div class="success-icon">
-          <svg class="w-10 h-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-          </svg>
-        </div>
-        <h3>Request Submitted!</h3>
-        <p>Your meeting request has been sent. You will receive a confirmation email once approved.</p>
-        <button @click="resetForm" class="modal-btn">Submit Another Request</button>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -235,7 +333,6 @@ const isDateBlocked = computed(() => {
 
 const generateSlots = async () => {
   loadingSlots.value = true;
-  // Simulate delay for feel, or remove if instant
   await new Promise(r => setTimeout(r, 300));
   
   if (isDateBlocked.value) {
@@ -284,7 +381,6 @@ const generateSlots = async () => {
 const changeDate = (days) => {
   const newDate = new Date(selectedDate.value);
   newDate.setDate(newDate.getDate() + days);
-  // Prevent going to past
   if (newDate >= new Date().setHours(0,0,0,0)) {
     selectedDate.value = newDate;
     form.preferred_date = newDate.toISOString().split('T')[0];
@@ -303,7 +399,7 @@ onMounted(() => {
   generateSlots();
 });
 
-// Re-generate if props change (though typically they are static for the page load, but good practice)
+// Re-generate if props change
 watch(() => props.existingMeetings, generateSlots);
 
 // Form
@@ -331,7 +427,6 @@ const resetForm = () => {
   showSuccess.value = false;
   form.reset();
   form.preferred_time = '';
-  // Reset date to today
   selectedDate.value = new Date();
   form.preferred_date = selectedDate.value.toISOString().split('T')[0];
   generateSlots();
@@ -339,603 +434,28 @@ const resetForm = () => {
 </script>
 
 <style scoped>
-.meeting-request-wrapper {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #e3f2fd 0%, #e8eaf6 50%, #ede7f6 100%);
-  position: relative;
-  overflow-x: hidden;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
 }
-
-/* Background Blobs */
-.bg-effects {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.5;
-  animation: float 20s ease-in-out infinite;
-}
-
-.blob-1 {
-  width: 500px;
-  height: 500px;
-  background: linear-gradient(135deg, #90caf9 0%, #80deea 100%);
-  top: -100px;
-  right: -100px;
-}
-
-.blob-2 {
-  width: 600px;
-  height: 600px;
-  background: linear-gradient(135deg, #b39ddb 0%, #ce93d8 100%);
-  bottom: -200px;
-  left: -200px;
-  animation-delay: -10s;
-}
-
-@keyframes float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -30px) scale(1.05); }
-  66% { transform: translate(-20px, 20px) scale(0.95); }
-}
-
-/* Header */
-.request-header {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-.header-content {
-  margin: 0 auto;
-  padding: 12px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.logo {
-  height: 48px;
-  width: auto;
-}
-
-.title-group h1 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1565c0;
-  margin: 0;
-}
-
-.title-group p {
-  font-size: 0.8rem;
-  color: #42a5f5;
-  margin: 0;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.datetime {
-  text-align: right;
-}
-
-.datetime .time {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1565c0;
-  font-family: monospace;
-}
-
-.datetime .date {
-  font-size: 0.8rem;
-  color: #64b5f6;
-}
-
-.director-photo {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 3px solid rgba(33, 150, 243, 0.2);
-  object-fit: cover;
-}
-
-/* Main Content */
-.main-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 20px;
-  position: relative;
-  z-index: 10;
-}
-
-.content-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.4fr;
-  gap: 32px;
-}
-
-/* Glass Cards */
-.glass-card {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px);
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-}
-
-/* Availability Section */
-.availability-section {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.card-header {
-  display: flex;
-  gap: 12px;
-  padding: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.header-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.header-icon svg {
-  width: 24px;
-  height: 24px;
-}
-
-.header-icon.purple {
-  background: linear-gradient(135deg, #bbdefb, #90caf9);
-  color: #1565c0;
-}
-
-.card-header h2 {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #1565c0;
-  margin: 0;
-}
-
-.card-header p {
-  font-size: 0.875rem;
-  color: #90a4ae;
-  margin: 4px 0 0;
-}
-
-/* Date Navigator */
-.date-navigator {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 20px 24px;
-  padding: 8px;
-  background: linear-gradient(135deg, #e3f2fd, #ede7f6);
-  border-radius: 16px;
-}
-
-.nav-btn {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  border: none;
-  border-radius: 12px;
-  color: #1565c0;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.nav-btn:hover {
-  background: #1565c0;
-  color: white;
-}
-
-.selected-date {
-  font-weight: 600;
-  color: #1565c0;
-}
-
-/* Slots */
-.slots-container {
-  padding: 0 16px 16px;
-}
-
-.slots-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.slot-btn {
-  padding: 14px 16px;
-  background: white;
-  border: 2px solid #e3f2fd;
-  border-radius: 14px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #424242;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.slot-btn:hover:not(:disabled) {
-  border-color: #1565c0;
-  background: #e3f2fd;
-}
-
-.slot-btn.selected {
-  background: linear-gradient(135deg, #1565c0, #42a5f5);
-  border-color: transparent;
-  color: white;
-  box-shadow: 0 4px 16px rgba(21, 101, 192, 0.3);
-}
-
-.slot-btn.unavailable {
-  background: #f5f5f5;
-  border-color: #eeeeee;
-  color: #bdbdbd;
-  cursor: not-allowed;
-  text-decoration: line-through;
-}
-
-.booked-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  text-decoration: none;
-}
-
-.loading-state {
-  text-align: center;
-  padding: 48px;
-  color: #90a4ae;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #e3f2fd;
-  border-top-color: #1565c0;
-  border-radius: 50%;
-  margin: 0 auto 16px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.empty-slots {
-  text-align: center;
-  padding: 48px;
-  color: #90a4ae;
-  background: #fafafa;
-  border-radius: 16px;
-  border: 2px dashed #e0e0e0;
-}
-
-/* Contact Card */
-.contact-card {
-  padding: 24px;
-  background: linear-gradient(135deg, rgba(187, 222, 251, 0.5), rgba(225, 190, 231, 0.3));
-}
-
-.contact-card h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1565c0;
-  margin: 0 0 8px;
-}
-
-.contact-card p {
-  font-size: 0.875rem;
-  color: #5c6bc0;
-  margin: 0 0 16px;
-}
-
-.phone-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #1565c0;
-  text-decoration: none;
-}
-
-.phone-link:hover {
-  text-decoration: underline;
-}
-
-/* Form Section */
-.form-card {
-  overflow: hidden;
-}
-
-.form-header {
-  padding: 16px;
-  background: linear-gradient(135deg, #1565c0, #42a5f5);
-  color: white;
-}
-
-.form-header h2 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 4px;
-}
-
-.form-header p {
-  font-size: 0.875rem;
-  opacity: 0.9;
-  margin: 0;
-}
-
-.request-form {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #424242;
-  margin-bottom: 8px;
-}
-
-.required {
-  color: #e53935;
-}
-
-.form-input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 14px;
-  font-size: 0.9rem;
-  transition: all 0.2s;
-  background: white;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #1565c0;
-  box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.1);
-}
-
-.form-input::placeholder {
-  color: #bdbdbd;
-}
-
-textarea.form-input {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.field-error {
-  font-size: 0.75rem;
-  color: #e53935;
-  margin-top: 6px;
-}
-
-/* Selection Summary */
-.selection-summary {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, #e3f2fd, #ede7f6);
-  border-radius: 16px;
-}
-
-.summary-item .label {
-  display: block;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #78909c;
-  margin-bottom: 4px;
-}
-
-.summary-item .value {
-  font-weight: 600;
-  color: #1565c0;
-}
-
-.summary-item .value.placeholder {
-  color: #b0bec5;
-  font-style: italic;
-  font-weight: 400;
-}
-
-.divider {
-  width: 1px;
-  height: 40px;
-  background: #b0bec5;
-}
-
-/* Submit Button */
-.submit-btn {
-  width: 100%;
-  padding: 18px 24px;
-  background: linear-gradient(135deg, #1565c0, #42a5f5);
-  color: white;
-  border: none;
-  border-radius: 16px;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 8px 24px rgba(21, 101, 192, 0.3);
-}
-
-.submit-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(21, 101, 192, 0.4);
-}
-
-.submit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
+::-webkit-scrollbar-track {
+  background: transparent; 
 }
-
-.privacy-note {
-  text-align: center;
-  font-size: 0.75rem;
-  color: #9e9e9e;
-  margin: 0;
-}
-
-/* Footer */
-.request-footer {
-  text-align: center;
-  padding: 24px;
-  font-size: 0.8rem;
-  color: #78909c;
-  position: relative;
-  z-index: 10;
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-}
-
-.modal-card {
-  background: white;
-  border-radius: 32px;
-  padding: 48px;
-  max-width: 420px;
-  width: 100%;
-  text-align: center;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
-  animation: scaleIn 0.3s ease-out;
-}
-
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.success-icon {
-  width: 80px;
-  height: 80px;
-  background: #e8f5e9;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 24px;
-}
-
-.success-icon svg {
-  width: 40px;
-  height: 40px;
-  color: #43a047;
-}
-
-.modal-card h3 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #212121;
-  margin: 0 0 12px;
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1; 
+  border-radius: 6px;
 }
-
-.modal-card p {
-  font-size: 0.9rem;
-  color: #757575;
-  margin: 0 0 32px;
-}
-
-.modal-btn {
-  padding: 16px 32px;
-  background: linear-gradient(135deg, #1565c0, #42a5f5);
-  color: white;
-  border: none;
-  border-radius: 16px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.modal-btn:hover {
-  transform: translateY(-2px);
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; 
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-  .content-grid {
-    grid-template-columns: 1fr;
-  }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
 }
 
-@media (max-width: 640px) {
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-  
-  .header-content {
-    padding: 12px 16px;
-  }
-  
-  .title-group {
-    display: none;
-  }
-  
-  .main-content {
-    padding: 16px;
-  }
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
